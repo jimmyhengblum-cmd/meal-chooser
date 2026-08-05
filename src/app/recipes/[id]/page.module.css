@@ -1,0 +1,101 @@
+.container {
+  display: flex;
+  flex-direction: column;
+  gap: 32px;
+  width: 100%;
+  max-width: 800px;
+  margin: 0 auto;
+  padding: 32px 24px;
+}
+
+.header {
+  display: flex;
+  gap: 24px;
+  flex-wrap: wrap;
+}
+
+.imageWrapper {
+  position: relative;
+  width: 260px;
+  max-width: 100%;
+  aspect-ratio: 4 / 3;
+  border-radius: 8px;
+  overflow: hidden;
+  flex-shrink: 0;
+}
+
+.image {
+  object-fit: cover;
+}
+
+.header h1 {
+  font-size: 28px;
+  font-weight: 600;
+}
+
+.description {
+  margin-top: 8px;
+  color: color-mix(in srgb, currentColor 70%, transparent);
+}
+
+.meta {
+  display: flex;
+  gap: 24px;
+  margin-top: 16px;
+  font-size: 14px;
+}
+
+.meta dt {
+  color: color-mix(in srgb, currentColor 60%, transparent);
+}
+
+.meta dd {
+  font-weight: 500;
+}
+
+.addToPlanForm {
+  margin-top: 16px;
+}
+
+.addToPlanButton {
+  padding: 10px 16px;
+  border-radius: 6px;
+  border: none;
+  background: var(--foreground);
+  color: var(--background);
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+}
+
+.body {
+  display: flex;
+  flex-direction: column;
+  gap: 32px;
+}
+
+.body h2 {
+  font-size: 20px;
+  font-weight: 600;
+  margin-bottom: 12px;
+}
+
+.ingredients {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding-left: 20px;
+}
+
+.instructionGroup h3 {
+  font-size: 16px;
+  font-weight: 600;
+  margin: 16px 0 8px;
+}
+
+.instructionGroup ol {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  padding-left: 20px;
+}

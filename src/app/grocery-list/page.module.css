@@ -1,0 +1,67 @@
+.container {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+  width: 100%;
+  max-width: 600px;
+  margin: 0 auto;
+  padding: 32px 24px;
+}
+
+.toolbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.toolbar a {
+  font-size: 14px;
+  text-decoration: underline;
+}
+
+.empty {
+  color: color-mix(in srgb, currentColor 60%, transparent);
+}
+
+.list {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 10px 0;
+  border-bottom: 1px solid color-mix(in srgb, currentColor 10%, transparent);
+}
+
+.checkForm {
+  flex: 1;
+}
+
+.label {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 15px;
+  cursor: pointer;
+}
+
+.checked {
+  text-decoration: line-through;
+  color: color-mix(in srgb, currentColor 50%, transparent);
+}
+
+.remove {
+  background: none;
+  border: none;
+  padding: 0;
+  font-size: 12px;
+  color: color-mix(in srgb, currentColor 60%, transparent);
+  text-decoration: underline;
+  cursor: pointer;
+}
