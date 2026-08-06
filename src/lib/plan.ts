@@ -76,40 +76,61 @@ export async function removePlanEntry(entryId: string) {
 }
 
 // Prep/cook time and servings don't reliably separate real dishes from
-// condiments, drinks, spice mixes, and how-to techniques scraped alongside
-// them: e.g. "Croquette Sandwich" (5 min, servings 2) is a real meal while
-// "Homemade Japanese Curry Powder" (5 min, servings 6) isn't, and "Gyoza"
-// legitimately yields 52 (pieces, not people). Title-based filtering works
-// better, but a plain keyword search over the whole title is too blunt —
-// "Grilled Oysters with Ponzu Sauce" or "Kimchi Jjigae (Kimchi Stew)" are
-// full dishes whose *name* happens to mention a sauce/kimchi ingredient.
-// So: a dish-type word (stew, rice, grilled, ...) or " with " anywhere
-// always wins (it's describing a real dish); only titles that are just a
-// short, bare condiment/drink/kimchi-variety name — nothing else — are
-// treated as not-a-meal. "How to ..." titles are technique articles, not
-// recipes, and are always excluded.
+// condiments, drinks, spice mixes, desserts, and how-to techniques scraped
+// alongside them: e.g. "Croquette Sandwich" (5 min, servings 2) is a real
+// meal while "Homemade Japanese Curry Powder" (5 min, servings 6) isn't,
+// and "Gyoza" legitimately yields 52 (pieces, not people). Title-based
+// filtering works better, but a plain keyword search over the whole title
+// is too blunt — "Grilled Oysters with Ponzu Sauce" or "Kimchi Jjigae
+// (Kimchi Stew)" are full dishes whose *name* happens to mention a
+// sauce/kimchi ingredient, and "Gungjung Tteokbokki (Royal Court Rice
+// Cake)" is a savory dish despite ending in "Cake". So: a dish-type word
+// (stew, rice, grilled, ...) or " with " anywhere always wins (it's
+// describing a real dish); only titles that are just a short, bare
+// condiment/drink/dessert/kimchi-variety name — nothing else — are treated
+// as not-a-meal. "How to ..." titles and anything explicitly labeled
+// "(Dessert)" are always excluded.
 const HOW_TO_PATTERN = /how to/i;
+const EXPLICIT_DESSERT_PATTERN = /\bdessert\b/i;
 const DISH_TYPE_OVERRIDE =
   /\b(stir-fry|stir fry|stew|soup|curry|noodles?|ramen|salad|sandwich|bento|pancakes?|dumplings?|gyoza|casserole|hot ?pot|bibimbap|bulgogi|jjigae|jjim|guksu|bokkeum|jorim|muchim|nabe|donburi|katsu|tempura|yakitori|teriyaki|karaage|grilled?|roast(ed)?|braised|steak|chops?|wings?|skewers?|kebab|taco|burger|pizza|pasta|spaghetti|omelette|tamagoyaki|sukiyaki|shabu|bowl|platter|fried rice|fried chicken|rice)\b/i;
 const NON_MEAL_WORDS = new Set([
   "sauce", "syrup", "dressing", "dip", "dipping", "ponzu", "marinade",
   "paste", "powder", "dashi", "broth", "stock", "smoothie", "latte", "tea",
   "coffee", "milk", "mayo", "eggnog", "kimchi",
+  "cookie", "tart", "pudding", "mochi", "chocolate", "brownie", "madeleine",
+  "parfait", "mousse", "jelly", "donut", "doughnut", "macaron", "biscuit",
+  "brulee", "sorbet", "sundae", "pie", "muffin", "scone", "waffle", "dango",
+  "cheesecake", "shortcake", "tiramisu", "toffee", "cake",
 ]);
+
+// Strips accents (e.g. "Brûlée" -> "brulee") so NON_MEAL_WORDS only needs
+// plain-ASCII entries.
+function cleanWord(word: string): string {
+  return word
+    .normalize("NFD")
+    .replace(/[̀-ͯ]/g, "")
+    .toLowerCase()
+    .replace(/[^a-z]/g, "");
+}
 
 function isLikelyFullMeal(title: string): boolean {
   if (HOW_TO_PATTERN.test(title)) return false;
+  if (EXPLICIT_DESSERT_PATTERN.test(title)) return false;
   if (DISH_TYPE_OVERRIDE.test(title)) return true;
   if (/ with /i.test(title)) return true;
+
   const words = title
     .replace(/[()]/g, " ")
     .split(/[\s\-–—]+/)
     .filter(Boolean);
+  const wordFromEnd = (fromEnd: number) => cleanWord(words[words.length - fromEnd] ?? "");
+  const lastWord = wordFromEnd(1).replace(/s$/, "");
+
+  if (wordFromEnd(1) === "cream" && wordFromEnd(2) === "ice") return false;
+  if (lastWord === "cake" && wordFromEnd(2) === "rice") return true;
+
   if (words.length > 7) return true;
-  const lastWord = words[words.length - 1]
-    ?.toLowerCase()
-    .replace(/[^a-z]/g, "")
-    .replace(/s$/, "");
   return !(lastWord && NON_MEAL_WORDS.has(lastWord));
 }
 
