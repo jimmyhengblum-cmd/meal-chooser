@@ -75,6 +75,44 @@ export async function removePlanEntry(entryId: string) {
   if (error) throw error;
 }
 
+// Prep/cook time and servings don't reliably separate real dishes from
+// condiments, drinks, spice mixes, and how-to techniques scraped alongside
+// them: e.g. "Croquette Sandwich" (5 min, servings 2) is a real meal while
+// "Homemade Japanese Curry Powder" (5 min, servings 6) isn't, and "Gyoza"
+// legitimately yields 52 (pieces, not people). Title-based filtering works
+// better, but a plain keyword search over the whole title is too blunt —
+// "Grilled Oysters with Ponzu Sauce" or "Kimchi Jjigae (Kimchi Stew)" are
+// full dishes whose *name* happens to mention a sauce/kimchi ingredient.
+// So: a dish-type word (stew, rice, grilled, ...) or " with " anywhere
+// always wins (it's describing a real dish); only titles that are just a
+// short, bare condiment/drink/kimchi-variety name — nothing else — are
+// treated as not-a-meal. "How to ..." titles are technique articles, not
+// recipes, and are always excluded.
+const HOW_TO_PATTERN = /how to/i;
+const DISH_TYPE_OVERRIDE =
+  /\b(stir-fry|stir fry|stew|soup|curry|noodles?|ramen|salad|sandwich|bento|pancakes?|dumplings?|gyoza|casserole|hot ?pot|bibimbap|bulgogi|jjigae|jjim|guksu|bokkeum|jorim|muchim|nabe|donburi|katsu|tempura|yakitori|teriyaki|karaage|grilled?|roast(ed)?|braised|steak|chops?|wings?|skewers?|kebab|taco|burger|pizza|pasta|spaghetti|omelette|tamagoyaki|sukiyaki|shabu|bowl|platter|fried rice|fried chicken|rice)\b/i;
+const NON_MEAL_WORDS = new Set([
+  "sauce", "syrup", "dressing", "dip", "dipping", "ponzu", "marinade",
+  "paste", "powder", "dashi", "broth", "stock", "smoothie", "latte", "tea",
+  "coffee", "milk", "mayo", "eggnog", "kimchi",
+]);
+
+function isLikelyFullMeal(title: string): boolean {
+  if (HOW_TO_PATTERN.test(title)) return false;
+  if (DISH_TYPE_OVERRIDE.test(title)) return true;
+  if (/ with /i.test(title)) return true;
+  const words = title
+    .replace(/[()]/g, " ")
+    .split(/[\s\-–—]+/)
+    .filter(Boolean);
+  if (words.length > 7) return true;
+  const lastWord = words[words.length - 1]
+    ?.toLowerCase()
+    .replace(/[^a-z]/g, "")
+    .replace(/s$/, "");
+  return !(lastWord && NON_MEAL_WORDS.has(lastWord));
+}
+
 function shuffle<T>(items: T[]): T[] {
   const result = [...items];
   for (let i = result.length - 1; i > 0; i--) {
@@ -118,10 +156,19 @@ export async function generateWeekPlan(weekStart: Date) {
 
   const { data: recipes, error: recipesError } = await supabase
     .from("recipes")
-    .select("id");
+    .select("id, title");
   if (recipesError) throw recipesError;
 
-  const allIds = (recipes ?? []).map((r) => r.id);
+  const mealIds = (recipes ?? [])
+    .filter((r) => isLikelyFullMeal(r.title))
+    .map((r) => r.id);
+  // Fall back to the full catalog if the meal-only filter leaves too little
+  // to fill the week, rather than silently doing nothing.
+  const allIds =
+    mealIds.length >= emptySlots.length
+      ? mealIds
+      : (recipes ?? []).map((r) => r.id);
+
   const unused = shuffle(allIds.filter((id) => !usedRecipeIds.has(id)));
   const pool = unused.length >= emptySlots.length ? unused : shuffle(allIds);
   if (pool.length === 0) return;
