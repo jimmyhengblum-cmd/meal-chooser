@@ -10,16 +10,12 @@ export default async function Home() {
 
   return (
     <div className={styles.page}>
-      <main className={styles.main}>
-        <div className={styles.intro}>
-          <h1>Welcome{user?.email ? `, ${user.email}` : ""}</h1>
-          <p>
-            Build your <Link href="/plan">weekly meal plan</Link> from the{" "}
-            <Link href="/recipes">recipes</Link>, then generate your{" "}
-            <Link href="/grocery-list">grocery list</Link>.
-          </p>
-        </div>
-      </main>
+      <h1>Welcome{user?.email ? `, ${user.email}` : ""}</h1>
+      <p>
+        Build your <Link href="/plan">weekly meal plan</Link> from the{" "}
+        <Link href="/recipes">recipes</Link>, then generate your{" "}
+        <Link href="/grocery-list">grocery list</Link>.
+      </p>
     </div>
   );
 }

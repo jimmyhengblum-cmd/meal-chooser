@@ -24,6 +24,16 @@
 
 .weekNav a {
   text-decoration: underline;
+  transition: opacity 0.15s ease;
+}
+
+.weekNav a:hover {
+  opacity: 0.7;
+}
+
+.actions {
+  display: flex;
+  gap: 12px;
 }
 
 .generateButton {
@@ -35,6 +45,27 @@
   font-size: 14px;
   font-weight: 500;
   cursor: pointer;
+  transition: opacity 0.15s ease;
+}
+
+.generateButton:hover {
+  opacity: 0.85;
+}
+
+.generateButtonSecondary {
+  padding: 8px 14px;
+  border-radius: 6px;
+  border: 1px solid color-mix(in srgb, currentColor 20%, transparent);
+  background: transparent;
+  color: inherit;
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background-color 0.15s ease;
+}
+
+.generateButtonSecondary:hover {
+  background: color-mix(in srgb, currentColor 8%, transparent);
 }
 
 .tableWrapper {
@@ -104,7 +135,16 @@
   cursor: pointer;
 }
 
+.remove:hover {
+  color: color-mix(in srgb, currentColor 90%, transparent);
+}
+
 .addLink {
   display: inline-block;
   color: color-mix(in srgb, currentColor 50%, transparent);
+  transition: color 0.15s ease;
+}
+
+.addLink:hover {
+  color: color-mix(in srgb, currentColor 85%, transparent);
 }

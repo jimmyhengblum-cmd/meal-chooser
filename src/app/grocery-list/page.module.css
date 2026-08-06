@@ -18,6 +18,11 @@
 .toolbar a {
   font-size: 14px;
   text-decoration: underline;
+  transition: opacity 0.15s ease;
+}
+
+.toolbar a:hover {
+  opacity: 0.7;
 }
 
 .empty {
@@ -64,4 +69,8 @@
   color: color-mix(in srgb, currentColor 60%, transparent);
   text-decoration: underline;
   cursor: pointer;
+}
+
+.remove:hover {
+  color: color-mix(in srgb, currentColor 90%, transparent);
 }

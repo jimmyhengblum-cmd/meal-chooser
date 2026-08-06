@@ -1,7 +1,7 @@
 "use server";
 
 import { redirect } from "next/navigation";
-import { assignRecipeToPlan, removePlanEntry } from "@/lib/plan";
+import { assignRecipeToPlan, generateWeekPlan, removePlanEntry } from "@/lib/plan";
 import { MEAL_SLOTS, formatDate, startOfWeek, parseDate, type MealSlot } from "@/lib/week";
 
 function isMealSlot(value: string): value is MealSlot {
@@ -26,6 +26,14 @@ export async function removeFromPlan(formData: FormData) {
   const week = String(formData.get("week") ?? "");
 
   await removePlanEntry(entryId);
+
+  redirect(`/plan?week=${week}`);
+}
+
+export async function generateWeek(formData: FormData) {
+  const week = String(formData.get("week") ?? "");
+
+  await generateWeekPlan(parseDate(week));
 
   redirect(`/plan?week=${week}`);
 }

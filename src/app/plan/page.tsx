@@ -1,7 +1,7 @@
 import Link from "next/link";
 import Image from "next/image";
 import { getWeekPlan } from "@/lib/plan";
-import { removeFromPlan } from "./actions";
+import { generateWeek, removeFromPlan } from "./actions";
 import { generateFromWeek } from "@/app/grocery-list/actions";
 import {
   MEAL_SLOTS,
@@ -50,12 +50,20 @@ export default async function PlanPage(props: PageProps<"/plan">) {
           <Link href={`/plan?week=${prevWeek}`}>&larr; Previous week</Link>
           <Link href={`/plan?week=${nextWeek}`}>Next week &rarr;</Link>
         </nav>
-        <form action={generateFromWeek}>
-          <input type="hidden" name="week" value={weekParamValue} />
-          <button type="submit" className={styles.generateButton}>
-            Generate grocery list
-          </button>
-        </form>
+        <div className={styles.actions}>
+          <form action={generateWeek}>
+            <input type="hidden" name="week" value={weekParamValue} />
+            <button type="submit" className={styles.generateButtonSecondary}>
+              Auto-fill lunch &amp; dinner
+            </button>
+          </form>
+          <form action={generateFromWeek}>
+            <input type="hidden" name="week" value={weekParamValue} />
+            <button type="submit" className={styles.generateButton}>
+              Generate grocery list
+            </button>
+          </form>
+        </div>
       </div>
 
       <div className={styles.tableWrapper}>

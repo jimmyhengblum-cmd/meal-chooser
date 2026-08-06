@@ -50,6 +50,11 @@
   font-size: 14px;
   font-weight: 500;
   cursor: pointer;
+  transition: opacity 0.15s ease;
+}
+
+.submit:hover:not(:disabled) {
+  opacity: 0.85;
 }
 
 .submit:disabled {
