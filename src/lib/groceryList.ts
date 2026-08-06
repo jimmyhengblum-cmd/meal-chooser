@@ -1,34 +1,61 @@
 import { createClient } from "@/lib/supabase/server";
 import { addDays, formatDate } from "@/lib/week";
 
-export type GroceryListItem = {
+export type GroceryListLine = {
   id: string;
-  name: string;
   quantity: number | null;
   unit: string | null;
   checked: boolean;
 };
 
-export async function getGroceryList(): Promise<GroceryListItem[]> {
+// Same ingredient can appear with different units across recipes (e.g. "2
+// tsp" from one recipe, "10 ml" from another) — quantities aren't summed
+// across units (see generateGroceryListFromWeek), but grouping them under
+// one shopping-list entry still keeps the list scannable.
+export type GroceryListGroup = {
+  ingredientId: string;
+  name: string;
+  lines: GroceryListLine[];
+};
+
+export async function getGroceryList(): Promise<GroceryListGroup[]> {
   const supabase = await createClient();
 
   const { data, error } = await supabase
     .from("grocery_list_items")
-    .select("id, quantity, unit, checked, ingredients(name, name_fr)")
-    .order("checked")
+    .select("id, ingredient_id, quantity, unit, checked, ingredients(name, name_fr)")
     .order("created_at");
 
   if (error) throw error;
 
-  return (data ?? [])
-    .filter((row) => row.ingredients)
-    .map((row) => ({
+  const groups = new Map<string, GroceryListGroup>();
+  for (const row of data ?? []) {
+    if (!row.ingredients) continue;
+    const line: GroceryListLine = {
       id: row.id,
-      name: row.ingredients!.name_fr ?? row.ingredients!.name,
       quantity: row.quantity,
       unit: row.unit,
       checked: row.checked,
-    }));
+    };
+
+    const existing = groups.get(row.ingredient_id);
+    if (existing) {
+      existing.lines.push(line);
+    } else {
+      groups.set(row.ingredient_id, {
+        ingredientId: row.ingredient_id,
+        name: row.ingredients.name_fr ?? row.ingredients.name,
+        lines: [line],
+      });
+    }
+  }
+
+  return Array.from(groups.values()).sort((a, b) => {
+    const aChecked = a.lines.every((l) => l.checked);
+    const bChecked = b.lines.every((l) => l.checked);
+    if (aChecked !== bChecked) return aChecked ? 1 : -1;
+    return a.name.localeCompare(b.name);
+  });
 }
 
 // Aggregates every recipe assigned in the given week into grocery list

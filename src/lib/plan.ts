@@ -143,6 +143,28 @@ function shuffle<T>(items: T[]): T[] {
   return result;
 }
 
+// Removes lunch/dinner entries for the week. Breakfast is left untouched,
+// consistent with the auto-fill/reroll features never touching it either.
+export async function clearWeekPlan(weekStart: Date) {
+  const supabase = await createClient();
+  const days = weekDates(weekStart).map(formatDate);
+
+  const { error } = await supabase
+    .from("meal_plan_entries")
+    .delete()
+    .in("planned_date", days)
+    .in("meal_slot", ["lunch", "dinner"] satisfies MealSlot[]);
+
+  if (error) throw error;
+}
+
+// Clears the week's lunch/dinner entries and redraws them from scratch,
+// unlike generateWeekPlan below which only fills gaps.
+export async function rerollWeekPlan(weekStart: Date) {
+  await clearWeekPlan(weekStart);
+  await generateWeekPlan(weekStart);
+}
+
 // Fills empty lunch/dinner slots for the week with random recipes, avoiding
 // repeats within the week where the catalog is large enough to do so.
 // Breakfast and already-filled slots are left untouched.

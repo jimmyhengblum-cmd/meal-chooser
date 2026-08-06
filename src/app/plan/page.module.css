@@ -33,6 +33,7 @@
 
 .actions {
   display: flex;
+  flex-wrap: wrap;
   gap: 12px;
 }
 
@@ -66,6 +67,22 @@
 
 .generateButtonSecondary:hover {
   background: color-mix(in srgb, currentColor 8%, transparent);
+}
+
+.dangerButton {
+  padding: 8px 14px;
+  border-radius: 6px;
+  border: 1px solid color-mix(in srgb, #e5484d 40%, transparent);
+  background: transparent;
+  color: #e5484d;
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background-color 0.15s ease;
+}
+
+.dangerButton:hover {
+  background: color-mix(in srgb, #e5484d 10%, transparent);
 }
 
 .tableWrapper {

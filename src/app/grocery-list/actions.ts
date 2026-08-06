@@ -10,10 +10,12 @@ import {
 import { startOfWeek, parseDate } from "@/lib/week";
 
 export async function toggleItem(formData: FormData) {
-  const itemId = String(formData.get("itemId") ?? "");
-  const wasChecked = formData.get("checked") === "true";
+  const itemIds = String(formData.get("itemIds") ?? "")
+    .split(",")
+    .filter(Boolean);
+  const checked = formData.get("checked") === "true";
 
-  await setItemChecked(itemId, !wasChecked);
+  await Promise.all(itemIds.map((id) => setItemChecked(id, checked)));
   revalidatePath("/grocery-list");
 }
 

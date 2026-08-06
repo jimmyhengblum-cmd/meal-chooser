@@ -1,8 +1,9 @@
 import Link from "next/link";
 import Image from "next/image";
 import { getWeekPlan } from "@/lib/plan";
-import { generateWeek, removeFromPlan } from "./actions";
+import { clearWeek, generateWeek, removeFromPlan, rerollWeek } from "./actions";
 import { generateFromWeek } from "@/app/grocery-list/actions";
+import { ConfirmButton } from "./ConfirmButton";
 import {
   MEAL_SLOTS,
   addDays,
@@ -56,6 +57,24 @@ export default async function PlanPage(props: PageProps<"/plan">) {
             <button type="submit" className={styles.generateButtonSecondary}>
               Auto-fill lunch &amp; dinner
             </button>
+          </form>
+          <form action={rerollWeek}>
+            <input type="hidden" name="week" value={weekParamValue} />
+            <ConfirmButton
+              className={styles.generateButtonSecondary}
+              confirmMessage="Redraw lunch and dinner for this week? This replaces every lunch/dinner recipe currently assigned."
+            >
+              Reroll
+            </ConfirmButton>
+          </form>
+          <form action={clearWeek}>
+            <input type="hidden" name="week" value={weekParamValue} />
+            <ConfirmButton
+              className={styles.dangerButton}
+              confirmMessage="Clear all lunch and dinner recipes for this week?"
+            >
+              Clear week
+            </ConfirmButton>
           </form>
           <form action={generateFromWeek}>
             <input type="hidden" name="week" value={weekParamValue} />
