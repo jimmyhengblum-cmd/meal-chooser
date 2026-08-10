@@ -37,68 +37,19 @@
   gap: 12px;
 }
 
-.generateButton {
-  padding: 8px 14px;
-  border-radius: 6px;
-  border: none;
-  background: var(--foreground);
-  color: var(--background);
-  font-size: 14px;
-  font-weight: 500;
-  cursor: pointer;
-  transition: opacity 0.15s ease;
-}
-
-.generateButton:hover {
-  opacity: 0.85;
-}
-
-.generateButtonSecondary {
-  padding: 8px 14px;
-  border-radius: 6px;
-  border: 1px solid color-mix(in srgb, currentColor 20%, transparent);
-  background: transparent;
-  color: inherit;
-  font-size: 14px;
-  font-weight: 500;
-  cursor: pointer;
-  transition: background-color 0.15s ease;
-}
-
-.generateButtonSecondary:hover {
-  background: color-mix(in srgb, currentColor 8%, transparent);
-}
-
-.dangerButton {
-  padding: 8px 14px;
-  border-radius: 6px;
-  border: 1px solid color-mix(in srgb, #e5484d 40%, transparent);
-  background: transparent;
-  color: #e5484d;
-  font-size: 14px;
-  font-weight: 500;
-  cursor: pointer;
-  transition: background-color 0.15s ease;
-}
-
-.dangerButton:hover {
-  background: color-mix(in srgb, #e5484d 10%, transparent);
-}
-
 .tableWrapper {
   overflow-x: auto;
 }
 
 .table {
   width: 100%;
-  border-collapse: collapse;
+  border-collapse: separate;
+  border-spacing: 8px;
   table-layout: fixed;
 }
 
 .table th,
 .table td {
-  border: 1px solid color-mix(in srgb, currentColor 12%, transparent);
-  padding: 8px;
   vertical-align: top;
   text-align: left;
   font-size: 13px;
@@ -107,11 +58,13 @@
 .table th {
   font-weight: 600;
   white-space: nowrap;
+  padding: 0 8px;
+  color: color-mix(in srgb, currentColor 65%, transparent);
 }
 
 .table td {
-  min-width: 120px;
-  height: 88px;
+  min-width: 130px;
+  height: 96px;
 }
 
 .cell {
@@ -119,6 +72,17 @@
   flex-direction: column;
   gap: 6px;
   height: 100%;
+  padding: 8px;
+  border-radius: var(--radius-card);
+  background: var(--surface);
+  border: 1px solid var(--border);
+  box-shadow: var(--shadow-card);
+  transition: box-shadow 0.15s ease, transform 0.15s ease;
+}
+
+.cell:hover {
+  box-shadow: var(--shadow-card-hover);
+  transform: translateY(-1px);
 }
 
 .recipeLink {
@@ -133,7 +97,7 @@
   position: relative;
   width: 100%;
   aspect-ratio: 16 / 9;
-  border-radius: 4px;
+  border-radius: 10px;
   overflow: hidden;
 }
 
@@ -147,21 +111,28 @@
   border: none;
   padding: 0;
   font-size: 12px;
-  color: color-mix(in srgb, currentColor 60%, transparent);
-  text-decoration: underline;
+  color: color-mix(in srgb, currentColor 55%, transparent);
   cursor: pointer;
 }
 
 .remove:hover {
-  color: color-mix(in srgb, currentColor 90%, transparent);
+  color: #e5484d;
 }
 
 .addLink {
-  display: inline-block;
-  color: color-mix(in srgb, currentColor 50%, transparent);
-  transition: color 0.15s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 100%;
+  border-radius: var(--radius-card);
+  border: 1px dashed var(--border);
+  color: color-mix(in srgb, currentColor 45%, transparent);
+  font-size: 13px;
+  transition: border-color 0.15s ease, color 0.15s ease, background-color 0.15s ease;
 }
 
 .addLink:hover {
-  color: color-mix(in srgb, currentColor 85%, transparent);
+  border-color: color-mix(in srgb, var(--accent) 50%, transparent);
+  color: var(--accent);
+  background: color-mix(in srgb, var(--accent) 6%, transparent);
 }

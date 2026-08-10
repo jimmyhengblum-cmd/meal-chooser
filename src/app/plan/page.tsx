@@ -13,6 +13,7 @@ import {
   weekDates,
 } from "@/lib/week";
 import styles from "./page.module.css";
+import buttons from "@/app/buttons.module.css";
 
 const SLOT_LABELS: Record<string, string> = {
   breakfast: "Breakfast",
@@ -54,14 +55,14 @@ export default async function PlanPage(props: PageProps<"/plan">) {
         <div className={styles.actions}>
           <form action={generateWeek}>
             <input type="hidden" name="week" value={weekParamValue} />
-            <button type="submit" className={styles.generateButtonSecondary}>
+            <button type="submit" className={`${buttons.btn} ${buttons.secondary}`}>
               Auto-fill lunch &amp; dinner
             </button>
           </form>
           <form action={rerollWeek}>
             <input type="hidden" name="week" value={weekParamValue} />
             <ConfirmButton
-              className={styles.generateButtonSecondary}
+              className={`${buttons.btn} ${buttons.secondary}`}
               confirmMessage="Redraw lunch and dinner for this week? This replaces every lunch/dinner recipe currently assigned."
             >
               Reroll
@@ -70,7 +71,7 @@ export default async function PlanPage(props: PageProps<"/plan">) {
           <form action={clearWeek}>
             <input type="hidden" name="week" value={weekParamValue} />
             <ConfirmButton
-              className={styles.dangerButton}
+              className={`${buttons.btn} ${buttons.danger}`}
               confirmMessage="Clear all lunch and dinner recipes for this week?"
             >
               Clear week
@@ -78,7 +79,7 @@ export default async function PlanPage(props: PageProps<"/plan">) {
           </form>
           <form action={generateFromWeek}>
             <input type="hidden" name="week" value={weekParamValue} />
-            <button type="submit" className={styles.generateButton}>
+            <button type="submit" className={`${buttons.btn} ${buttons.primary}`}>
               Generate grocery list
             </button>
           </form>

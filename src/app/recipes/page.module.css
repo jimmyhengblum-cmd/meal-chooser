@@ -23,14 +23,25 @@
 .card {
   display: flex;
   flex-direction: column;
-  gap: 8px;
+  gap: 10px;
+  padding: 10px;
+  border-radius: var(--radius-card);
   color: inherit;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  box-shadow: var(--shadow-card);
+  transition: box-shadow 0.15s ease, transform 0.15s ease;
+}
+
+.card:hover {
+  box-shadow: var(--shadow-card-hover);
+  transform: translateY(-2px);
 }
 
 .imageWrapper {
   position: relative;
   aspect-ratio: 4 / 3;
-  border-radius: 8px;
+  border-radius: 10px;
   overflow: hidden;
   background: color-mix(in srgb, currentColor 6%, transparent);
 }
@@ -59,10 +70,13 @@
 }
 
 .pagination a {
-  text-decoration: underline;
-  transition: opacity 0.15s ease;
+  padding: 6px 14px;
+  border-radius: var(--radius-pill);
+  border: 1px solid var(--border);
+  transition: border-color 0.15s ease, color 0.15s ease;
 }
 
 .pagination a:hover {
-  opacity: 0.7;
+  border-color: color-mix(in srgb, var(--accent) 50%, transparent);
+  color: var(--accent);
 }

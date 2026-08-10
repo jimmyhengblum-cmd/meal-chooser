@@ -4,6 +4,7 @@ import { getRecipe } from "@/lib/recipes";
 import { addToPlan } from "@/app/plan/actions";
 import type { RecipeInstructionStep } from "@/lib/supabase/types";
 import styles from "./page.module.css";
+import buttons from "@/app/buttons.module.css";
 
 function groupBySection(steps: RecipeInstructionStep[]) {
   const groups: { section: string | null; steps: RecipeInstructionStep[] }[] =
@@ -79,7 +80,7 @@ export default async function RecipePage(props: PageProps<"/recipes/[id]">) {
               <input type="hidden" name="plannedDate" value={planDate} />
               <input type="hidden" name="mealSlot" value={planSlot} />
               <input type="hidden" name="recipeId" value={recipe.id} />
-              <button type="submit" className={styles.addToPlanButton}>
+              <button type="submit" className={`${buttons.btn} ${buttons.primary}`}>
                 Add to plan for {planDate} ({planSlot})
               </button>
             </form>

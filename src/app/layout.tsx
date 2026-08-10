@@ -32,6 +32,10 @@ export default async function RootLayout({ children }: LayoutProps<"/">) {
       <body>
         {user && (
           <header className={styles.header}>
+            <Link href="/" className={styles.brand}>
+              <span className={styles.brandMark}>🍱</span>
+              <span className={styles.brandName}>Meal Chooser</span>
+            </Link>
             <nav className={styles.nav}>
               <Link href="/plan">Meal Plan</Link>
               <Link href="/recipes">Recipes</Link>

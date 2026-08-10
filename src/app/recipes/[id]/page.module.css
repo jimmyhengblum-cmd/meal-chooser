@@ -19,9 +19,10 @@
   width: 260px;
   max-width: 100%;
   aspect-ratio: 4 / 3;
-  border-radius: 8px;
+  border-radius: var(--radius-card);
   overflow: hidden;
   flex-shrink: 0;
+  box-shadow: var(--shadow-card);
 }
 
 .image {
@@ -40,9 +41,19 @@
 
 .meta {
   display: flex;
-  gap: 24px;
+  gap: 10px;
   margin-top: 16px;
-  font-size: 14px;
+  font-size: 13px;
+}
+
+.meta > div {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 12px;
+  border-radius: var(--radius-pill);
+  background: color-mix(in srgb, var(--accent) 8%, var(--surface));
+  border: 1px solid var(--border);
 }
 
 .meta dt {
@@ -50,27 +61,11 @@
 }
 
 .meta dd {
-  font-weight: 500;
+  font-weight: 600;
 }
 
 .addToPlanForm {
-  margin-top: 16px;
-}
-
-.addToPlanButton {
-  padding: 10px 16px;
-  border-radius: 6px;
-  border: none;
-  background: var(--foreground);
-  color: var(--background);
-  font-size: 14px;
-  font-weight: 500;
-  cursor: pointer;
-  transition: opacity 0.15s ease;
-}
-
-.addToPlanButton:hover {
-  opacity: 0.85;
+  margin-top: 20px;
 }
 
 .body {
