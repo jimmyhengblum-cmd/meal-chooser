@@ -12,11 +12,17 @@
   gap: 20px;
   width: 100%;
   max-width: 360px;
+  padding: 32px;
+  border-radius: var(--radius-card);
+  background: var(--surface);
+  border: 1px solid var(--border);
+  box-shadow: var(--shadow-card);
 }
 
 .card h1 {
   font-size: 24px;
-  font-weight: 600;
+  font-weight: 700;
+  letter-spacing: -0.01em;
 }
 
 .form {
@@ -34,32 +40,39 @@
 
 .field input {
   padding: 10px 12px;
-  border-radius: 6px;
-  border: 1px solid color-mix(in srgb, currentColor 20%, transparent);
+  border-radius: 10px;
+  border: 1px solid var(--border);
   background: transparent;
   color: inherit;
   font-size: 14px;
 }
 
+.field input:focus-visible {
+  border-color: color-mix(in srgb, var(--accent) 60%, var(--border));
+}
+
 .submit {
   padding: 10px 16px;
-  border-radius: 6px;
+  border-radius: var(--radius-pill);
   border: none;
-  background: var(--foreground);
-  color: var(--background);
+  background: var(--accent-gradient);
+  color: var(--accent-contrast);
   font-size: 14px;
   font-weight: 500;
   cursor: pointer;
-  transition: opacity 0.15s ease;
+  box-shadow: var(--shadow-card);
+  transition: transform 0.15s ease, box-shadow 0.15s ease, opacity 0.15s ease;
 }
 
 .submit:hover:not(:disabled) {
-  opacity: 0.85;
+  transform: translateY(-1px);
+  box-shadow: var(--shadow-card-hover);
 }
 
 .submit:disabled {
   opacity: 0.6;
   cursor: default;
+  transform: none;
 }
 
 .error {
@@ -69,4 +82,20 @@
 
 .notice {
   font-size: 14px;
+}
+
+.linkButton {
+  align-self: flex-start;
+  background: none;
+  border: none;
+  padding: 0;
+  font-size: 14px;
+  color: inherit;
+  text-decoration: underline;
+  cursor: pointer;
+}
+
+.linkButton:disabled {
+  opacity: 0.6;
+  cursor: default;
 }
