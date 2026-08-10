@@ -8,9 +8,12 @@
     "start": "next start",
     "lint": "eslint",
     "scrape": "tsx scripts/scrape/run.ts",
-    "translate": "tsx scripts/scrape/translate-pending.ts"
+    "translate": "tsx scripts/scrape/translate-pending.ts",
+    "classify": "tsx scripts/scrape/classify-pending.ts",
+    "clean-ingredients": "tsx scripts/scrape/clean-ingredients-pending.ts"
   },
   "dependencies": {
+    "@anthropic-ai/sdk": "^0.68.0",
     "@supabase/ssr": "^0.12.4",
     "@supabase/supabase-js": "^2.112.0",
     "deepl-node": "^1.27.0",

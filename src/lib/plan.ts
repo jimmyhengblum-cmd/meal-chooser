@@ -75,6 +75,8 @@ export async function removePlanEntry(entryId: string) {
   if (error) throw error;
 }
 
+// Fallback for recipes `dish_type` hasn't been set on yet (see
+// scripts/scrape/classify-pending.ts, which classifies with an LLM instead).
 // Prep/cook time and servings don't reliably separate real dishes from
 // condiments, drinks, spice mixes, desserts, and how-to techniques scraped
 // alongside them: e.g. "Croquette Sandwich" (5 min, servings 2) is a real
@@ -199,11 +201,11 @@ export async function generateWeekPlan(weekStart: Date) {
 
   const { data: recipes, error: recipesError } = await supabase
     .from("recipes")
-    .select("id, title");
+    .select("id, title, dish_type");
   if (recipesError) throw recipesError;
 
   const mealIds = (recipes ?? [])
-    .filter((r) => isLikelyFullMeal(r.title))
+    .filter((r) => (r.dish_type ? r.dish_type === "plat" : isLikelyFullMeal(r.title)))
     .map((r) => r.id);
   // Fall back to the full catalog if the meal-only filter leaves too little
   // to fill the week, rather than silently doing nothing.

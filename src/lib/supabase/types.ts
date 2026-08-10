@@ -14,6 +14,15 @@ export interface RecipeInstructionStep {
   text: string;
 }
 
+// Set by scripts/scrape/classify-pending.ts; null until classified.
+export type DishType =
+  | "plat"
+  | "entree"
+  | "dessert"
+  | "sauce_condiment"
+  | "boisson"
+  | "autre";
+
 export interface Database {
   public: {
     Views: Record<string, never>;
@@ -36,6 +45,7 @@ export interface Database {
           total_minutes: number | null;
           instructions: RecipeInstructionStep[];
           instructions_fr: RecipeInstructionStep[] | null;
+          dish_type: DishType | null;
           created_at: string;
         };
         Insert: {
@@ -54,6 +64,7 @@ export interface Database {
           total_minutes?: number | null;
           instructions?: RecipeInstructionStep[];
           instructions_fr?: RecipeInstructionStep[] | null;
+          dish_type?: DishType | null;
           created_at?: string;
         };
         Update: {
@@ -72,6 +83,7 @@ export interface Database {
           total_minutes?: number | null;
           instructions?: RecipeInstructionStep[];
           instructions_fr?: RecipeInstructionStep[] | null;
+          dish_type?: DishType | null;
           created_at?: string;
         };
         Relationships: [];
