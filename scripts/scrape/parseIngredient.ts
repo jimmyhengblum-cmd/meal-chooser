@@ -46,6 +46,9 @@ const UNITS = [
   "ml",
   "l",
   "liters?",
+  "gallons?",
+  "quarts?",
+  "pints?",
   "packages?",
   "packets?",
   "blocks?",
@@ -66,9 +69,10 @@ const UNIT_RE = new RegExp(`^(${UNITS.join("|")})\\b\\.?`, "i");
 
 const FRACTION_CHARS = "¼½¾⅓⅔⅕⅖⅗⅘⅙⅚⅛⅜⅝⅞";
 
+// A single bound: a plain number/decimal, a fraction, or a mixed number.
 // Tried in order — most specific pattern first, since e.g. "1-3/4" (a hyphen
-// mixed number, 1.75) must not be caught by the plainer "N-M" range pattern.
-const QUANTITY_PATTERNS: Array<{ re: RegExp; parse: (m: RegExpExecArray) => number }> = [
+// mixed number, 1.75) must not be caught by the plainer bare-number pattern.
+const BOUND_PATTERNS: Array<{ re: RegExp; parse: (m: RegExpExecArray) => number }> = [
   // "1-3/4" or "1 - 3/4": hyphen-joined mixed number with a written fraction.
   {
     re: /^(\d+)\s*-\s*(\d+)\/(\d+)/,
@@ -90,22 +94,43 @@ const QUANTITY_PATTERNS: Array<{ re: RegExp; parse: (m: RegExpExecArray) => numb
   },
   // "½": bare unicode fraction.
   { re: new RegExp(`^([${FRACTION_CHARS}])`), parse: (m) => UNICODE_FRACTIONS[m[1]] },
-  // "4-5", "4 to 5", "1.5 to 2.5": a range written with a hyphen or "to" —
-  // use the midpoint as the best single-number estimate.
-  {
-    re: /^(\d+(?:\.\d+)?)\s*(?:-|\bto\b)\s*(\d+(?:\.\d+)?)/,
-    parse: (m) => (Number(m[1]) + Number(m[2])) / 2,
-  },
   // "4" or "1.5": bare number.
   { re: /^(\d+(?:\.\d+)?)/, parse: (m) => Number(m[1]) },
 ];
 
-function matchLeadingQuantity(text: string): { value: number; length: number } | null {
-  for (const { re, parse } of QUANTITY_PATTERNS) {
+function matchBound(text: string): { value: number; length: number } | null {
+  for (const { re, parse } of BOUND_PATTERNS) {
     const m = re.exec(text);
     if (m) return { value: parse(m), length: m[0].length };
   }
   return null;
+}
+
+// A range's separator: a hyphen (ASCII "-", en dash "–", or em dash "—" —
+// recipe sites use all three interchangeably) or "to", with optional
+// surrounding whitespace.
+const RANGE_SEPARATOR_RE = /^\s*(?:[-–—]|\bto\b)\s*/;
+
+// "4-5", "4 to 5", "3/4 - 1", "½ -1", "2 – 3": a range whose bounds can each
+// independently be a plain number, decimal, or fraction — use the midpoint
+// as the best single-number estimate.
+function matchLeadingQuantity(text: string): { value: number; length: number } | null {
+  const first = matchBound(text);
+  if (!first) return null;
+
+  const sepMatch = RANGE_SEPARATOR_RE.exec(text.slice(first.length));
+  if (sepMatch) {
+    const afterSeparator = first.length + sepMatch[0].length;
+    const second = matchBound(text.slice(afterSeparator));
+    if (second) {
+      return {
+        value: (first.value + second.value) / 2,
+        length: afterSeparator + second.length,
+      };
+    }
+  }
+
+  return first;
 }
 
 // Pulls out parenthetical groups, one level of nesting deep — matches this
@@ -146,7 +171,12 @@ export function parseIngredientLine(raw: string): ParsedIngredientLine {
     return "";
   });
 
-  const name = rest.replace(/\s+/g, " ").trim();
+  // Collapses accidental repeats some source lines have, e.g. "3 large large
+  // eggs" -> "large eggs" (the quantity itself is parsed separately above).
+  const name = rest
+    .replace(/\s+/g, " ")
+    .trim()
+    .replace(/\b(\w+)(\s+\1)+\b/gi, "$1");
 
   return {
     name: name || raw.trim(),
