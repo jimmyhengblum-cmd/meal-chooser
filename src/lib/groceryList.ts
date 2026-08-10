@@ -1,5 +1,6 @@
 import { createClient } from "@/lib/supabase/server";
 import { addDays, formatDate } from "@/lib/week";
+import { formatQuantity } from "@/lib/format";
 
 export type GroceryListLine = {
   id: string;
@@ -131,6 +132,48 @@ export async function generateGroceryListFromWeek(weekStart: Date) {
     .insert(rows);
 
   if (insertError) throw insertError;
+}
+
+// Recipes are scraped in English with whatever units the source used (often
+// US customary — cups, tbsp, oz), and our own quantity parsing/translation
+// is best-effort at best (see scripts/scrape/parseIngredient.ts). Rather
+// than try to get unit conversion and French translation right ourselves,
+// this hands the raw English name/quantity/unit to the user as a prompt
+// they can paste into an LLM to get a clean, converted, translated list —
+// only unchecked items, since checked ones are already in the cart.
+export async function getGroceryListExportPrompt(): Promise<string> {
+  const supabase = await createClient();
+
+  const { data, error } = await supabase
+    .from("grocery_list_items")
+    .select("quantity, unit, ingredients(name)")
+    .eq("checked", false)
+    .order("created_at");
+
+  if (error) throw error;
+
+  const lines = (data ?? [])
+    .filter((row) => row.ingredients)
+    .map((row) => {
+      const parts = [
+        row.quantity != null ? formatQuantity(row.quantity) : null,
+        row.unit,
+        row.ingredients!.name,
+      ].filter(Boolean);
+      return `- ${parts.join(" ")}`;
+    });
+
+  return `Voici ma liste de courses, extraite de recettes en anglais (noms, quantités et unités d'origine, parfois impériales/US).
+
+Aide-moi à en faire une liste de courses prête à l'emploi :
+1. Traduis chaque ingrédient en français.
+2. Convertis les quantités dans une unité pratique pour faire les courses (grammes, millilitres, ou nombre d'unités), en additionnant les lignes d'un même ingrédient si plusieurs quantités/unités apparaissent pour lui.
+3. Arrondis à une quantité raisonnable à acheter en magasin.
+
+Ingrédients :
+${lines.join("\n")}
+
+Réponds uniquement avec la liste de courses finale en français, un ingrédient par ligne avec sa quantité.`;
 }
 
 export async function setItemChecked(itemId: string, checked: boolean) {

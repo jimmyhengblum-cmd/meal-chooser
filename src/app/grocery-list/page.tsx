@@ -10,7 +10,12 @@ export default async function GroceryListPage() {
     <div className={styles.container}>
       <div className={styles.toolbar}>
         <h1>Grocery list</h1>
-        <Link href="/plan">Back to meal plan</Link>
+        <div className={styles.toolbarLinks}>
+          {groups.length > 0 && (
+            <a href="/grocery-list/export">Export as prompt (.txt)</a>
+          )}
+          <Link href="/plan">Back to meal plan</Link>
+        </div>
       </div>
       {groups.length === 0 ? (
         <p className={styles.empty}>
