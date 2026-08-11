@@ -3,34 +3,34 @@
 import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 
-export type SendCodeState = { error: string } | { sent: true; email: string } | null;
-export type VerifyCodeState = { error: string } | null;
+export type AuthState = { error: string } | null;
 
-export async function sendOtpCode(
-  _prevState: SendCodeState,
+export async function signIn(
+  _prevState: AuthState,
   formData: FormData,
-): Promise<SendCodeState> {
+): Promise<AuthState> {
   const email = String(formData.get("email") ?? "");
+  const password = String(formData.get("password") ?? "");
 
   const supabase = await createClient();
-  const { error } = await supabase.auth.signInWithOtp({ email });
+  const { error } = await supabase.auth.signInWithPassword({ email, password });
 
   if (error) {
     return { error: error.message };
   }
 
-  return { sent: true, email };
+  redirect("/");
 }
 
-export async function verifyOtpCode(
-  _prevState: VerifyCodeState,
+export async function signUp(
+  _prevState: AuthState,
   formData: FormData,
-): Promise<VerifyCodeState> {
+): Promise<AuthState> {
   const email = String(formData.get("email") ?? "");
-  const token = String(formData.get("token") ?? "").trim();
+  const password = String(formData.get("password") ?? "");
 
   const supabase = await createClient();
-  const { error } = await supabase.auth.verifyOtp({ email, token, type: "email" });
+  const { error } = await supabase.auth.signUp({ email, password });
 
   if (error) {
     return { error: error.message };
