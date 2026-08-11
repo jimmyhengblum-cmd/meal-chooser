@@ -86,68 +86,60 @@ export default async function PlanPage(props: PageProps<"/plan">) {
         </div>
       </div>
 
-      <div className={styles.tableWrapper}>
-        <table className={styles.table}>
-          <thead>
-            <tr>
-              <th></th>
-              {days.map((day) => (
-                <th key={formatDate(day)}>{DAY_FORMATTER.format(day)}</th>
-              ))}
-            </tr>
-          </thead>
-          <tbody>
-            {MEAL_SLOTS.map((slot) => (
-              <tr key={slot}>
-                <th scope="row">{SLOT_LABELS[slot]}</th>
-                {days.map((day) => {
-                  const date = formatDate(day);
-                  const entry = entryFor(date, slot);
+      <div className={styles.week}>
+        {days.map((day) => {
+          const date = formatDate(day);
 
-                  return (
-                    <td key={date}>
-                      {entry ? (
-                        <div className={styles.cell}>
-                          <Link
-                            href={`/recipes/${entry.recipe.id}`}
-                            className={styles.recipeLink}
-                          >
-                            {entry.recipe.imageUrl && (
-                              <div className={styles.thumbnail}>
-                                <Image
-                                  src={entry.recipe.imageUrl}
-                                  alt={entry.recipe.title}
-                                  fill
-                                  sizes="80px"
-                                  className={styles.thumbnailImage}
-                                />
-                              </div>
-                            )}
-                            <span>{entry.recipe.title}</span>
-                          </Link>
-                          <form action={removeFromPlan}>
-                            <input type="hidden" name="entryId" value={entry.id} />
-                            <input type="hidden" name="week" value={weekParamValue} />
-                            <button type="submit" className={styles.remove}>
-                              Remove
-                            </button>
-                          </form>
-                        </div>
-                      ) : (
+          return (
+            <div className={styles.day} key={date}>
+              <h2 className={styles.dayHeading}>{DAY_FORMATTER.format(day)}</h2>
+              {MEAL_SLOTS.map((slot) => {
+                const entry = entryFor(date, slot);
+
+                return (
+                  <div className={styles.slot} key={slot}>
+                    <span className={styles.slotLabel}>{SLOT_LABELS[slot]}</span>
+                    {entry ? (
+                      <div className={styles.cell}>
                         <Link
-                          href={`/recipes?planDate=${date}&planSlot=${slot}`}
-                          className={styles.addLink}
+                          href={`/recipes/${entry.recipe.id}`}
+                          className={styles.recipeLink}
                         >
-                          + Add
+                          {entry.recipe.imageUrl && (
+                            <div className={styles.thumbnail}>
+                              <Image
+                                src={entry.recipe.imageUrl}
+                                alt={entry.recipe.title}
+                                fill
+                                sizes="80px"
+                                className={styles.thumbnailImage}
+                              />
+                            </div>
+                          )}
+                          <span>{entry.recipe.title}</span>
                         </Link>
-                      )}
-                    </td>
-                  );
-                })}
-              </tr>
-            ))}
-          </tbody>
-        </table>
+                        <form action={removeFromPlan}>
+                          <input type="hidden" name="entryId" value={entry.id} />
+                          <input type="hidden" name="week" value={weekParamValue} />
+                          <button type="submit" className={styles.remove}>
+                            Remove
+                          </button>
+                        </form>
+                      </div>
+                    ) : (
+                      <Link
+                        href={`/recipes?planDate=${date}&planSlot=${slot}`}
+                        className={styles.addLink}
+                      >
+                        + Add
+                      </Link>
+                    )}
+                  </div>
+                );
+              })}
+            </div>
+          );
+        })}
       </div>
     </div>
   );
